@@ -1,5 +1,9 @@
 # **Modeling a Mobile Repair Retail Store in Software**
 
+## Streamlit Demo
+
+[![](Streamlit_demo.jpeg)](https://replit.com/@terryblanc/demoretailstoremodel#main.py)
+
 ## Keychain Fixture
 
 ![](Keychain_fixture.png)
