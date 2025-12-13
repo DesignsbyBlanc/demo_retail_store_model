@@ -1,3 +1,13 @@
+"""
+This is a retail store dashboard that simulates sales and inventory management.
+
+Instructions to run on Replit:
+1. Via shell: Streamlit run main.py
+2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
+
+Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
+"""
+
 import sys
 import subprocess
 import os
