@@ -2,7 +2,7 @@
 This is a retail store dashboard that simulates sales and inventory management.
 
 Instructions to run on Replit:
-1. Via shell: Streamlit run main.py
+1. Via shell: "Streamlit run main.py --server.headless true"
 2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
 
 Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
@@ -34,7 +34,10 @@ if __name__ == "__main__":
             print("Launching Streamlit app...")
             python_exe = sys.executable
             script_path = os.path.abspath(__file__)
-            subprocess.run([python_exe, "-m", "streamlit", "run", script_path])
+            subprocess.run([
+                python_exe, "-m", "streamlit", "run", script_path,
+                "--server.headless", "true"
+            ])
 
 st.set_page_config(page_title="Retail Live Dashboard", layout="wide")
 

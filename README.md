@@ -8,7 +8,7 @@ This is a retail store dashboard that simulates sales and inventory management.
 [![](Streamlit_demo.jpeg)](https://replit.com/@terryblanc/demoretailstoremodel#main.py)
 
 Instructions to run on Replit:
-1. Via shell: Streamlit run main.py
+1. Via shell: `Streamlit run main.py --server.headless true`
 2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
 
 ## Keychain Fixture
