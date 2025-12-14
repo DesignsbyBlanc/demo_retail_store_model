@@ -103,6 +103,8 @@ class StoreItem:
         return self._record_transaction(-qty, "purchase")
 
     def return_item(self, qty: int = 1):
+        for _ in range(min(qty, len(self._sold_durations))):
+            self._sold_durations.pop()
         self.quantity += qty
         st.toast(f"Returned {qty} of {self.name}", duration="long")
         print(f"Returned {qty} of {self.name}")
@@ -227,9 +229,11 @@ if st.sidebar.button("Reset Store"):
 
 st.title("Live Retail Store Dashboard")
 
-total_units_sold = sum(-t.quantity_change for item in items
+total_units_sold = (sum(-t.quantity_change for item in items
                        for t in item.transactions
-                       if t.transaction_type == "purchase")
+                       if t.transaction_type == "purchase") - sum(t.quantity_change for item in items
+       for t in item.transactions
+       if t.transaction_type == "return"))
 
 avg_days = statistics.mean([i.average_days_to_sell for i in items])
 
@@ -251,8 +255,9 @@ st.subheader("Most Popular Items")
 
 fig1, ax1 = plt.subplots()
 sales = [
-    sum(-t.quantity_change for t in item.transactions
-        if t.transaction_type == "purchase") for item in items
+    (sum(-t.quantity_change for t in item.transactions
+        if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
+        if t.transaction_type == "return")) for item in items
 ]
 labels = [item.name for item in items]
 
@@ -268,8 +273,9 @@ st.pyplot(fig1)
 # Sales by location
 location_sales = {}
 for item in items:
-    sold = sum(-t.quantity_change for t in item.transactions
-               if t.transaction_type == "purchase")
+    sold = (sum(-t.quantity_change for t in item.transactions
+               if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
+                  if t.transaction_type == "return"))
     location_sales[item.location] = location_sales.get(item.location, 0) + sold
 
 df_sales = pd.DataFrame.from_dict(location_sales,
