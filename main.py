@@ -2,7 +2,7 @@
 This is a retail store dashboard that simulates sales and inventory management.
 
 Instructions to run on Replit:
-1. Via shell: "Streamlit run main.py --server.headless true"
+1. Via shell: "streamlit run main.py --server.headless true"
 2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
 
 Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
@@ -22,6 +22,7 @@ import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 
 load_dotenv()
 
@@ -97,14 +98,20 @@ class StoreItem:
             self._sold_durations.append(days_on_shelf)
 
         self.quantity -= qty
+        st.toast(f"Sold {qty} of {self.name}", duration="long")
+        print(f"Sold {qty} of {self.name}")
         return self._record_transaction(-qty, "purchase")
 
     def return_item(self, qty: int = 1):
         self.quantity += qty
+        st.toast(f"Returned {qty} of {self.name}", duration="long")
+        print(f"Returned {qty} of {self.name}")
         return self._record_transaction(qty, "return")
 
     def replenish(self, qty: int = 1):
         self.quantity += qty
+        st.toast(f"Replenished {qty} of {self.name}", duration="long")
+        print(f"Replenished {qty} of {self.name}")
         return self._record_transaction(qty, "replenish")
 
     @property
@@ -154,7 +161,7 @@ def generate_store():
 if "store_items" not in st.session_state:
     st.session_state.store_items = generate_store()
 
-items = st.session_state.store_items  # ← This is ALWAYS a list now
+items = st.session_state.store_items
 
 # ------------------------------------------
 # 4. SIDEBAR CONTROLS
@@ -162,7 +169,7 @@ items = st.session_state.store_items  # ← This is ALWAYS a list now
 
 st.sidebar.header("Inventory Actions")
 
-item_names = [i.name for i in items]  # ← SAFE now
+item_names = [i.name for i in items]
 selected_item_name = st.sidebar.selectbox("Select item", item_names)
 selected_item = next(i for i in items if i.name == selected_item_name)
 
@@ -173,22 +180,42 @@ c1, c2, c3 = st.sidebar.columns(3)
 if c1.button("Sell"):
     try:
         selected_item.purchase(qty)
+        items = st.session_state.store_items
         st.sidebar.success(f"Sold {qty}")
-    except:
-        st.sidebar.error("Not enough inventory")
+        print(f"{st.session_state.store_items}")
+        time.sleep(0.25)
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Error: {e}")
 
 if c2.button("Restock"):
-    selected_item.replenish(qty)
-    st.sidebar.success("Restocked")
+    try:
+        selected_item.replenish(qty)
+        items = st.session_state.store_items
+        st.sidebar.success("Restocked")
+        print(f"{st.session_state.store_items}")
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Error: {e}")
 
 if c3.button("Return"):
-    selected_item.return_item(qty)
-    st.sidebar.success("Returned to inventory")
+    try:
+        selected_item.return_item(qty)
+        items = st.session_state.store_items
+        st.sidebar.success("Returned to inventory")
+        print(f"{st.session_state.store_items}")
+        time.sleep(0.25)
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Error: {e}")
 
 if st.sidebar.button("Simulate Day Passing"):
     for item in items:
         item.shelf_tracking.date_displayed -= timedelta(days=1)
+        print(f"New shelf date: {item.shelf_tracking.date_displayed} for {item.name}")
+    items = st.session_state.store_items
     st.sidebar.info("Day passed")
+    st.rerun()
 
 if st.sidebar.button("Reset Store"):
     st.session_state.store_items = generate_store()
