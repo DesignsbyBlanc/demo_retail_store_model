@@ -11,7 +11,6 @@ Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
 import sys
 import subprocess
 import os
-from dotenv import load_dotenv
 import streamlit as st
 from dataclasses import dataclass, field
 from typing import List
@@ -23,24 +22,43 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
+import socket
 
-load_dotenv()
+st.set_page_config(page_title="Retail Live Dashboard", layout="wide")
 
-if __name__ == "__main__":
-    if "streamlit" not in sys.argv[0]:
-        if os.environ.get("STREAMLIT_RUNNING"):
-            pass
-        else:
-            os.environ["STREAMLIT_RUNNING"] = "True"
-            print("Launching Streamlit app...")
-            python_exe = sys.executable
-            script_path = os.path.abspath(__file__)
-            subprocess.run([
+def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((host, port)) == 0
+
+def launch_streamlit():
+    """Prevent infinite loop of launching Streamlit on Replit"""
+    if os.environ.get("STREAMLIT_RUNNING"):
+        return
+    if st.runtime.exists():
+        """
+        1: Streamlit is already running.
+        2: Port 8501 is in use. If both conditions true app likely run via 
+        "streamlit run". I can add logic later to use another port.
+        3: Streamlit is not running. Launch it.
+        """
+        os.environ["STREAMLIT_RUNNING"] = "1"
+        if is_port_in_use(8501):
+            os.environ["STREAMLIT_RUNNING"] = "2"
+        return
+    else:
+        os.environ["STREAMLIT_RUNNING"] = "3"
+        print("Launching Streamlit app...")
+        python_exe = sys.executable
+        script_path = os.path.abspath(__file__)
+        subprocess.run([
                 python_exe, "-m", "streamlit", "run", script_path,
                 "--server.headless", "true"
             ])
+        sys.exit(0)
 
-st.set_page_config(page_title="Retail Live Dashboard", layout="wide")
+if __name__ == "__main__":
+    launch_streamlit()
+
 
 # ------------------------------------------
 # 1. DATA MODELS
