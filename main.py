@@ -7,39 +7,42 @@
 
 # Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
 
-import sys
-import subprocess
 import os
-import streamlit as st
-from dataclasses import dataclass, field
-from typing import List
-from datetime import datetime, timedelta
-import uuid
-import statistics
 import random
+import socket
+import statistics
+import subprocess
+import sys
+import time
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import List
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import time
-import socket
+import streamlit as st
 
 st.set_page_config(page_title="Retail Live Dashboard", layout="wide")
+
 
 def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
 
+
 def launch_streamlit():
-    """Prevent infinite loop of launching Streamlit on Replit"""
+    # Prevent infinite loop of launching Streamlit on Replit
     if os.environ.get("STREAMLIT_RUNNING"):
         return
-    if st.runtime.exists():
-        
+    if st.runtime.exists(): # type: ignore
+
        # 1: Streamlit is already running.
-       # 2: Port 8501 is in use. If both conditions true app likely run via 
+       # 2: Port 8501 is in use. If both conditions true app likely run via
        #  "streamlit run". I can add logic later to use another port.
        # 3: Streamlit is not running. Launch it.
-       
+
         os.environ["STREAMLIT_RUNNING"] = "1"
         if is_port_in_use(8501):
             os.environ["STREAMLIT_RUNNING"] = "2"
@@ -50,10 +53,11 @@ def launch_streamlit():
         python_exe = sys.executable
         script_path = os.path.abspath(__file__)
         subprocess.run([
-                python_exe, "-m", "streamlit", "run", script_path,
-                "--server.headless", "true"
-            ])
+            python_exe, "-m", "streamlit", "run", script_path,
+            "--server.headless", "true"
+        ])
         sys.exit(0)
+
 
 if __name__ == "__main__":
     launch_streamlit()
@@ -231,7 +235,8 @@ if c3.button("Return"):
 if st.sidebar.button("Simulate Day Passing"):
     for item in items:
         item.shelf_tracking.date_displayed -= timedelta(days=1)
-        print(f"New shelf date: {item.shelf_tracking.date_displayed} for {item.name}")
+        print(
+            f"New shelf date: {item.shelf_tracking.date_displayed} for {item.name}")
     items = st.session_state.store_items
     st.sidebar.info("Day passed")
     st.rerun()
@@ -247,10 +252,10 @@ if st.sidebar.button("Reset Store"):
 st.title("Live Retail Store Dashboard")
 
 total_units_sold = (sum(-t.quantity_change for item in items
-                       for t in item.transactions
-                       if t.transaction_type == "purchase") - sum(t.quantity_change for item in items
-       for t in item.transactions
-       if t.transaction_type == "return"))
+                        for t in item.transactions
+                        if t.transaction_type == "purchase") - sum(t.quantity_change for item in items
+                                                                   for t in item.transactions
+                                                                   if t.transaction_type == "return"))
 
 avg_days = statistics.mean([i.average_days_to_sell for i in items])
 
@@ -273,8 +278,8 @@ st.subheader("Most Popular Items")
 fig1, ax1 = plt.subplots()
 sales = [
     (sum(-t.quantity_change for t in item.transactions
-        if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
-        if t.transaction_type == "return")) for item in items
+         if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
+                                                    if t.transaction_type == "return")) for item in items
 ]
 labels = [item.name for item in items]
 
@@ -291,8 +296,8 @@ st.pyplot(fig1)
 location_sales = {}
 for item in items:
     sold = (sum(-t.quantity_change for t in item.transactions
-               if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
-                  if t.transaction_type == "return"))
+                if t.transaction_type == "purchase") - sum(t.quantity_change for t in item.transactions
+                                                           if t.transaction_type == "return"))
     location_sales[item.location] = location_sales.get(item.location, 0) + sold
 
 df_sales = pd.DataFrame.from_dict(location_sales,
