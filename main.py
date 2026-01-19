@@ -1,12 +1,11 @@
-"""
-This is a retail store dashboard that simulates sales and inventory management.
 
-Instructions to run on Replit:
-1. Via shell: "streamlit run main.py --server.headless true"
-2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
+# This is a retail store dashboard that simulates sales and inventory management.
 
-Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
-"""
+# Instructions to run on Replit:
+# 1. Via shell: "streamlit run main.py --server.headless true"
+# 2. Via button: Clicking the "Run" button will launch Streamlit via subprocess.
+
+# Github: https://github.com/DesignsbyBlanc/demo_retail_store_model
 
 import sys
 import subprocess
@@ -35,12 +34,12 @@ def launch_streamlit():
     if os.environ.get("STREAMLIT_RUNNING"):
         return
     if st.runtime.exists():
-        """
-        1: Streamlit is already running.
-        2: Port 8501 is in use. If both conditions true app likely run via 
-        "streamlit run". I can add logic later to use another port.
-        3: Streamlit is not running. Launch it.
-        """
+        
+       # 1: Streamlit is already running.
+       # 2: Port 8501 is in use. If both conditions true app likely run via 
+       #  "streamlit run". I can add logic later to use another port.
+       # 3: Streamlit is not running. Launch it.
+       
         os.environ["STREAMLIT_RUNNING"] = "1"
         if is_port_in_use(8501):
             os.environ["STREAMLIT_RUNNING"] = "2"
